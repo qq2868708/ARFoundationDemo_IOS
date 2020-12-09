@@ -6,19 +6,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
-using System.Runtime.Serialization.Formatters;
-using System.Runtime.Serialization.Formatters.Binary;
+
 #if UNITY_IOS
 using UnityEngine.XR.ARKit;
 #endif
-
-[System.Serializable]
-internal class GamObjectInfomation
-{
-    public GameObject gameObject;
-    public string gamObjectName;
-    public Transform gameObjectTransform;
-}
 
 public class ARWorldMapManager : MonoBehaviour
 {
@@ -82,9 +73,6 @@ public class ARWorldMapManager : MonoBehaviour
         set { m_LoadButton = value; }
     }
 
-    //所有添加对象的根
-    public GameObject gameObjectRoot;
-    internal List<GamObjectInfomation> gameObjects;
 
     public void OnSaveButton()
     {
@@ -115,18 +103,6 @@ public class ARWorldMapManager : MonoBehaviour
             yield break;
         }
 
-        for(int i=0;i<gameObjectRoot.transform.childCount;i++)
-        {
-            var temp = new GamObjectInfomation();
-            var tempObj = gameObjectRoot.transform.GetChild(i).gameObject;
-            temp.gameObject = tempObj;
-            temp.gamObjectName = tempObj.name;
-            temp.gameObjectTransform = tempObj.transform;
-            gameObjects.Add(temp);
-        }
-
-        SaveBinary();
-
         var request = sessionSubsystem.GetARWorldMapAsync();
 
         while (!request.status.IsDone())
@@ -144,22 +120,7 @@ public class ARWorldMapManager : MonoBehaviour
         SaveAndDisposeWorldMap(worldMap);
     }
 
-    void SaveBinary()
-    {
-        try
-        {
-            FileStream file = null;
-            BinaryFormatter bf = new BinaryFormatter();
-            file = File.Open(pathObj, FileMode.Create);
-            bf.Serialize(file, gameObjects);
-            file.Close();
-            print("成功存储");
-        }
-        catch (System.Exception ex)
-        {
-            Debug.LogError("存储失败----" + ex.Message);
-        }
-    }
+   
 
     IEnumerator Load()
     {
@@ -233,15 +194,11 @@ public class ARWorldMapManager : MonoBehaviour
     {
         get
         {
+#if UNITY_EDITOR
+            return Path.Combine(Application.dataPath, "my_session.worldmap");
+#elif UNITY_IOS
             return Path.Combine(Application.persistentDataPath, "my_session.worldmap");
-        }
-    }
-
-    string pathObj
-    {
-        get
-        {
-            return Path.Combine(Application.persistentDataPath, "my_session_Obj.worldmap");
+#endif
         }
     }
 
