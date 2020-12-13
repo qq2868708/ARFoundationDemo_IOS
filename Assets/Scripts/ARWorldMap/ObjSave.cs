@@ -81,8 +81,6 @@ public class ObjSave : MonoBehaviour
     private void SaveJson()
     {
         FileStream file = new FileStream(pathJson, FileMode.Create);
-        file.Close();
-        file = new FileStream(pathJson, FileMode.Append);
         for (int i = 0; i < gameObjectRoot.transform.childCount; i++)
         {
             var temp = new GamObjectInfomation();
