@@ -132,7 +132,6 @@ public class CameraController : MonoBehaviour
         //直接移动arsessionorigin导致相机旋转
         //arSessionOrigin.transform.Translate(dir * moveSpeed, Space.World);
 
-        //
         arSessionOrigin.MakeContentAppearAt(terrain.transform, terrain.transform.position + dir * moveSpeed);
     }
 
